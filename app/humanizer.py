@@ -2,7 +2,7 @@ import asyncio
 from typing import Dict, List
 import time
 import re
-from .patterns import AdvancedPatterns
+from .patterns import AdvancedPatterns, TYPO_RULES
 from .openai_client import OpenAIHumanizer
 from .models import ProcessingMode
 
@@ -110,14 +110,19 @@ class HybridHumanizer:
     def _build_response(self, original: str, humanized: str, changes: List[str], 
                        processing_time: float, method: str) -> Dict:
         """Build standardized response"""
+        
+        # Apply grammar and typo fixes before finalizing
+        fixed_text, grammar_fixes = self._fix_grammar_and_typos(humanized)
+        all_changes = changes + grammar_fixes
+        
         return {
             'original': original,
-            'humanized': humanized,
+            'humanized': fixed_text,
             'processing_time_ms': processing_time * 1000,
-            'ai_detection_estimate': self._estimate_ai_detection(humanized),
+            'ai_detection_estimate': self._estimate_ai_detection(fixed_text),
             'method_used': method,
-            'changes_applied': changes,
-            'word_count_change': len(humanized.split()) - len(original.split())
+            'changes_applied': all_changes,
+            'word_count_change': len(fixed_text.split()) - len(original.split())
         }
     
     def _estimate_ai_detection(self, text: str) -> float:
@@ -141,4 +146,18 @@ class HybridHumanizer:
     async def batch_humanize(self, texts: List[str], mode: ProcessingMode = ProcessingMode.BALANCED) -> List[Dict]:
         """Process multiple texts in parallel"""
         tasks = [self.humanize(text, mode) for text in texts]
-        return await asyncio.gather(*tasks) 
+        return await asyncio.gather(*tasks)
+
+    def _fix_grammar_and_typos(self, text: str) -> tuple[str, List[str]]:
+        """Fix common grammatical errors and typos introduced by transformations."""
+        modified_text = text
+        fixes_applied = []
+        
+        for pattern, replacement in TYPO_RULES:
+            old_text = modified_text
+            modified_text = re.sub(pattern, replacement, modified_text, flags=re.IGNORECASE)
+            
+            if old_text != modified_text:
+                fixes_applied.append(f"Grammar fix: {pattern} → {replacement}")
+        
+        return modified_text, fixes_applied 

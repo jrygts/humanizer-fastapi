@@ -104,3 +104,49 @@ class AdvancedPatterns:
             processed_sentences.append(sentence)
         
         return ' '.join(processed_sentences), changes 
+
+# NEW: Grammar and typo hotfix rules - applied AFTER main transformations
+TYPO_RULES = [
+    # Subject-verb agreement fixes
+    (r'\bpersons has\b', 'persons have'),
+    (r'\bpeople has\b', 'people have'),
+    (r'\bindividuals has\b', 'individuals have'),
+    (r'\bdevelopers has\b', 'developers have'),
+    (r'\bcompanies has\b', 'companies have'),
+    (r'\bstudents has\b', 'students have'),
+    (r'\bresearchers has\b', 'researchers have'),
+    
+    # Fix "has/have the ability to" agreement
+    (r'\b(people|individuals|developers|companies|students|researchers) has the ability to\b', r'\1 have the ability to'),
+    (r'\b(people|individuals|developers|companies|students|researchers) has been\b', r'\1 have been'),
+    
+    # Remove stray "together with" in awkward positions
+    (r'^([^.]{1,50}) together with development([^a-z])', r'\1 development\2'),
+    (r'^([^.]{1,50}) together with innovation([^a-z])', r'\1 innovation\2'),
+    (r'^([^.]{1,50}) together with research([^a-z])', r'\1 research\2'),
+    
+    # Fix duplicated conjunctions and words
+    (r'\bwhile while\b', 'while'),
+    (r'\balthough although\b', 'although'),
+    (r'\bbecause because\b', 'because'),
+    (r'\btogether with together with\b', 'together with'),
+    (r'\bas well as as well as\b', 'as well as'),
+    
+    # Fix awkward "which which" constructions
+    (r'\bwhich which\b', 'which'),
+    
+    # Fix misplaced articles
+    (r'\ba a\b', 'a'),
+    (r'\bthe the\b', 'the'),
+    
+    # Fix verb tense consistency in opening transforms
+    (r'^([^.]*?) are is\b', r'\1 are'),
+    (r'^([^.]*?) is are\b', r'\1 is'),
+    
+    # Fix dangling prepositions from transforms
+    (r'\b(with|by|for|in|on|at) \b', r'\1 '),
+    
+    # Clean up spacing issues
+    (r'\s+', ' '),  # Multiple spaces to single space
+    (r'^\s+|\s+$', ''),  # Trim leading/trailing spaces
+] 
