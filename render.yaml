@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fastapi-humanizer
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-3.5-turbo
+      - key: OPENAI_TEMPERATURE
+        value: "0.9"
+      - key: ENVIRONMENT
+        value: production 
