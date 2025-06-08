@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: fastapi-humanizer
-    runtime: python
+    name: humanizer-api
+    env: python
+    plan: free
+    branch: main
+    root: humanizer-fastapi
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    plan: free
     healthCheckPath: /health
     envVars:
       - key: OPENAI_MODEL
