@@ -48,17 +48,30 @@ git push origin main
 # 2. Connect to Render.com
 # - Go to https://render.com and sign in with GitHub
 # - Click "New+" → "Web Service"
-# - Connect your repository
-# - Select the humanizer-fastapi directory as the root
+# - Connect your repository and select the main branch
+# - Set root directory to "humanizer-fastapi"
+# - Render will automatically detect render.yaml and configure the service
 
-# 3. Render will automatically detect render.yaml and deploy
+# 3. Configure Environment Variables
+# In Render Dashboard → Environment:
+# - Add Secret: OPENAI_API_KEY = your-openai-api-key
+# Other variables are pre-configured in render.yaml
+
+# 4. Deploy
+# Click "Create Web Service" - Render will build and deploy automatically
 ```
 
-**Environment Variables to Set in Render Dashboard:**
-- `OPENAI_API_KEY`: Your OpenAI API key (sk-...)
-- `OPENAI_MODEL`: gpt-3.5-turbo (default)
-- `OPENAI_TEMPERATURE`: 0.9 (default)
-- `ENVIRONMENT`: production (default)
+**Required Environment Variable in Render Dashboard:**
+- **Secret**: `OPENAI_API_KEY` = `sk-your-openai-key-here`
+
+**Pre-configured Variables (in render.yaml):**
+- `OPENAI_MODEL`: gpt-3.5-turbo
+- `OPENAI_TEMPERATURE`: 0.9
+- `ENVIRONMENT`: production
+
+**Build Process:**
+- Render runs: `pip install -r requirements.txt`
+- Starts with: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
 **After Deployment:**
 - Your API will be available at: `https://your-app-name.onrender.com`
